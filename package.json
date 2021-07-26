@@ -1,0 +1,19 @@
+{
+  "name": "package.json",
+  "version": "1.0.0",
+  "description": "Site les petits plats",
+  "main": "index.js",
+  "scripts": {
+    "sass": "sass --watch ./scss:./public/css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021.git"
+  },
+  "author": "Nico Rabarisoa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021/issues"
+  },
+  "homepage": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021#readme"
+}
