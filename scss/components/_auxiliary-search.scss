@@ -2,25 +2,45 @@
 
 .auxiliary-search {
   display: flex;
-  cursor: pointer;
+  position: relative;
 
   .select {
     color: #fff;
     display: flex;
     min-width: 170px;
     justify-content: space-between;
+    align-items: center;
     padding: 1rem;
     border-radius: 5px;
     font-size: 1.125rem;
+    cursor: pointer;
     font-weight: 700;
   }
 
-  &.ingredient-color {
+  input,
+  ul {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+  }
+
+  input {
+    position: absolute;
+  }
+
+  .focus,
+  .focus + ul {
+    visibility: visible;
+    width: 100%;
+    height: auto;
+  }
+
+  &.ingredients-color {
     .select {
       @include tag-background($color-accent-first);
     }
   }
-  &.equipment-color {
+  &.appliance-color {
     .select {
       @include tag-background($color-accent-second);
     }
