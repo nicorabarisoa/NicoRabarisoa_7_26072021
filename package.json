@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021/issues"
   },
-  "homepage": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021#readme"
+  "homepage": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021#readme",
+  "devDependencies": {
+    "eslint": "^7.31.0"
+  }
 }
