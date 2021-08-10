@@ -2,12 +2,13 @@
 
 .result-card {
   height: 380px;
-   width: 364px;
+  width: 364px;
   border-radius: 5px;
   background-color: $color-background-500;
   display: flex;
   align-items: flex-end;
   overflow: hidden;
+
   &__content {
     background-color: $color-background-300;
     flex: 1;
@@ -19,6 +20,7 @@
       justify-content: space-between;
       font-size: 1.125rem;
       margin-bottom: 1rem;
+      align-items: start;
 
       h2 {
         font-weight: 400;
@@ -30,16 +32,17 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        min-width: 6rem;
       }
     }
 
     &__body {
       font-size: 0.75rem;
       display: flex;
+      justify-content: space-between;
 
-      ul,
-      p {
-        width: 50%;
+      ul {
+        width: 40%;
       }
 
       li {
@@ -48,6 +51,13 @@
 
       p {
         line-height: 1.2;
+        -webkit-line-clamp: 7;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        max-height: calc(7 * 1rem);
+        overflow: hidden;
+        width: 55%;
       }
     }
   }
