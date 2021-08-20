@@ -5,15 +5,15 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021.git"
+    "url": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021.git"
   },
   "scripts": {
-    "sass": "sass --watch ./src/scss:./public/css --style=compressed"
+    "sass": "sass --watch ./src/scss:./dist/css --style=compressed"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "homepage": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021.git/index.html",
+  "homepage": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021/index.html",
   "devDependencies": {
     "eslint": "^7.30.0",
     "eslint-config-airbnb-base": "^14.2.1",
