@@ -26,7 +26,7 @@ const onLoad = () => {
   const applianceAuxiliary = new AuxiliarySearch('appliance', recipes);
   const ustensilAuiliary = new AuxiliarySearch('ustensils', recipes);
   const searchResults = new SearchResults(recipes);
-  // generation du dom
+  // generation du dom 
   const auxiliaries = [ingredientAuxiliary, applianceAuxiliary, ustensilAuiliary];
   const auxiliaryContainer = createAuxiliaryGroup(auxiliaries);
 

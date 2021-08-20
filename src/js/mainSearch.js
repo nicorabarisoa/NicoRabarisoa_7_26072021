@@ -1,3 +1,4 @@
+/* barre de recherche principale */
 export default class MainSearch {
   constructor() {}
 
