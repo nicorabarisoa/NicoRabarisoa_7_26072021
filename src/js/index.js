@@ -1,41 +1,42 @@
-/* 
-  lors du chargement :
-    
-  - créer une instance de mainSearchBar
+/*
+  on load :
+    - créer une instance de mainSearchBar
     - créer une instance de mots-clés
     - créer 3 instances de liste déroulante
     - créer une instance de résultats
     - créer une instance de recherche
 
-    - affiche la page
-    -  remplir les listes déroulantes et la liste des résultats en fonction des recettes
+    - afficher la page
+    - remplir les listes déroulantes et la liste des résultats en fonction des recettes
+
+    - pousser les rappels onChanges pour rechercher
     
-    - mainSearchBar input value modification event :        
-      - input.js
+    - événement de modification de la valeur d'entrée mainSearchBar :
+      - entrée.js
         - mainSearchBar.setSearchTerms()
         - mainSearchBar.getSearchTerms()
         - keywords.getKeywords()
-        - search.launchSearch(searchTerms, keywords)
+        - search.launchSearch (termes de recherche, mots-clés)
         - search.getResults()
 
-    - dropdown input value modification event :
+    - événement de modification de la valeur d'entrée de la liste déroulante :
       - dropdown.js
-        - filterKeywords()
+        - filterMots clés()
 
-    - dropdown keyword selection event :
+    - événement de sélection de mot-clé déroulant :
       - index.js
-        - keywords.onChange(add, selectedKeyword)
+        - keywords.onChange(ajouter, mot-clé sélectionné)
         - mainSearchBar.getSearchTerms()
         - keywords.getKeywords()
-        - search.launchSearch(searchTerms, keywords)
+        - search.launchSearch (termes de recherche, mots-clés)
         - search.getResults()
 
-    - keyword deletion event :
+    - événement de suppression de mot-clé :
       - index.js
-        - keywords.onChange(remove, clickedKeyword)
+        - keywords.onChange(supprimer, mot-clé cliqué)
         - mainSearchBar.getSearchTerms()
         - keywords.getKeywords()
-        - search.launchSearch(searchTerms, keywords)
+        - search.launchSearch (termes de recherche, mots-clés)
         - search.getResults()
 */
 
@@ -98,7 +99,7 @@ const handleMainSearchBarSearch = (mainSearchBar, search) => {
 };
 
 const onLoad = () => {
-  // init objects
+  // initialise les objets
   const mainSearchBar = new MainSearchBar();
   const ingredientsDropdown = new Dropdown('ingredients');
   const applianceDropdown = new Dropdown('appliance');
@@ -108,21 +109,24 @@ const onLoad = () => {
   const search = new Search(recipes);
   const dropdowns = [ingredientsDropdown, applianceDropdown, ustensilsDropdown];
 
-  // Display DOM with empty list and results
+  // Affiche le DOM avec une liste et des résultats vides
   displayPage(mainSearchBar, keywords, dropdowns, recipeResults);
 
-  // Push functions that will get search Terms and keywords for search
+  
+//  push les fonctions qui obtiendront les termes de recherche et les mots-clés pour la recherche
   search.dataFuncs.push(mainSearchBar.getSearchTerms.bind(mainSearchBar));
   search.dataFuncs.push(keywords.getKeywords.bind(keywords));
 
-  // Push functions that will generate lists and results in DOM to search
+  // Push des fonctions qui généreront des listes et des résultats dans le DOM pour rechercher
   dropdowns.forEach((dropdown) => search.resultFuncs.push(dropdown.onChange.bind(dropdown)));
   search.resultFuncs.push(recipeResults.onChange.bind(recipeResults));
 
-  // Fill lists and results on load based off all recipes
+  
+// Remplir les listes et les résultats au chargement en fonction de toutes les recettes
   search.displayResults(recipes);
 
-  // Handle click event on keyword from dropdown list to add to keyword selection and search
+  
+// Gére l'événement de clic sur le mot clé dans la liste déroulante pour l'ajouter à la sélection et à la recherche de mots clés
 
   handleKeywordAddition(keywords, search);
   handleKeywordDeletion(keywords, search);

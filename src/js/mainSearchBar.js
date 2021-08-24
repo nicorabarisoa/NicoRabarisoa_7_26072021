@@ -2,8 +2,7 @@ export default class MainSearchBar {
   constructor() {
     this.searchTerms = '';
   }
- 
-// Créer une barre de recherche
+  // Crée search bar
   createDOM() {
     const label = document.createElement('label');
     label.setAttribute('for', 'mainSearch');
@@ -16,8 +15,7 @@ export default class MainSearchBar {
     return label;
   }
 
-  
-// retourne le DOM de la barre de recherche
+  // return DOM du searchBar
   getDOM() {
     return this.createDOM();
   }

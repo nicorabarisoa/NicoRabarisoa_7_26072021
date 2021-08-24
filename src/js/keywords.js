@@ -3,8 +3,8 @@ export default class Keywords {
     this.selectedKeywords = new Map();
   }
 
-
- // créer un conteneur de mots clés
+  
+// créer un conteneur de mots clés
   createDOM() {
     const container = document.createElement('div');
     container.className = 'keywords-container';
@@ -12,7 +12,7 @@ export default class Keywords {
     return container;
   }
 
- 
+  
 // renvoie le DOM du conteneur de mots-clés
   getDOM() {
     return this.createDOM();
@@ -23,13 +23,13 @@ export default class Keywords {
     return this.selectedKeywords;
   }
 
- 
+  
 // créer un élément DOM de mot-clé
   createKeywordButton(mapKeyword) {
     const button = document.createElement('button');
     button.classList.add('keyword', `${mapKeyword.id}-color`);
     button.setAttribute('data-id', mapKeyword.id);
-    button.textContent = mapKeyword.keyword;
+    button.textContent = mapKeyword.label;
 
     const img = document.createElement('img');
     img.src = 'public/img/cross.svg';
@@ -38,7 +38,8 @@ export default class Keywords {
     return button;
   }
 
-  // créer et ajouter une balise mot-clé ou supprimer de la liste affichée
+  
+// créer et ajouter un tag mot-clé ou supprimer de la liste affichée
   updateKeywordList() {
     const container = document.getElementById('jsKeywords');
 
@@ -50,13 +51,13 @@ export default class Keywords {
     });
   }
 
-  // ajoute un mot-clé au map s'il n'y est pas déjà, supprime le mot-clé s'il est présent, puis met à jour la liste affichée
-  onChange(id, keyword) {
-    const keywordHash = `${id}-${keyword}`;
+  // ajoute un mot-clé au map  s'il n'y est pas déjà, supprime le mot-clé s'il est présent, puis met à jour la liste affichée
+  onChange(id, label) {
+    const keywordHash = `${id}-${label}`;
     if (this.selectedKeywords.get(keywordHash)) {
       this.selectedKeywords.delete(keywordHash);
     } else {
-      this.selectedKeywords.set(keywordHash, { id, keyword });
+      this.selectedKeywords.set(keywordHash, { id, label });
     }
     this.updateKeywordList();
   }

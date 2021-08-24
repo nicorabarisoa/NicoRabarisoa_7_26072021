@@ -1,5 +1,5 @@
 export default class Results {
- 
+  
 // créer un conteneur de résultats
   createDOM() {
     const container = document.createElement('div');
@@ -9,7 +9,8 @@ export default class Results {
     return container;
   }
 
-  // retourne le DOM du conteneur de résultats
+  
+// retourne le DOM du conteneur de résultats
   getDOM() {
     return this.createDOM();
   }
@@ -56,7 +57,8 @@ export default class Results {
       const li = document.createElement('li');
       const ingredientName = document.createElement('strong');
 
-      // Changer le texteContenu de l'ingrédient selon s'il a une quantité et une unité de quantité
+      
+// Change le textContent de l'ingrédient selon s'il a une quantité et une unité de quantité
       if (quantity) {
         ingredientName.textContent = `${ingredient} : `;
         const quantityElement = document.createElement('span');
@@ -98,11 +100,9 @@ export default class Results {
     return article;
   }
 
- 
+  
 // effacer la liste des résultats et remplir avec de nouveaux résultats
   onChange(results) {
-    
-// à faire: trouver un moyen de se débarrasser de la recherche de conteneur dans le DOM
     const container = document.getElementById('jsResults');
 
     while (container.lastElementChild) container.removeChild(container.lastElementChild);

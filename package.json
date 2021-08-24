@@ -8,7 +8,7 @@
     "url": "https://github.com/nicorabarisoa/NicoRabarisoa_7_26072021.git"
   },
   "scripts": {
-    "sass": "sass --watch ./src/scss:./dist/css --style=compressed"
+    "sass": "sass --watch ./src/scss:./public/css --style=compressed"
   },
   "keywords": [],
   "author": "",

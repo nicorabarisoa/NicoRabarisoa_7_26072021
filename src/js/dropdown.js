@@ -14,7 +14,7 @@ export default class Dropdown {
   }
 
   attachDropdownEvents(details) {
-    // toggle les événements
+    // toggle events
     details.addEventListener('toggle', (e) => {
       if (!e.target.open) return;
       const openDropdowns = document.querySelectorAll('.auxiliary-search[open]');
@@ -24,14 +24,15 @@ export default class Dropdown {
       });
     });
 
-    //  cliquer en dehors le ferme
+    
+// cliquer en dehors ferme
     window.addEventListener('click', (e) => {
       if (!details.open || e.target.closest('[open]') === details) return;
       details.removeAttribute('open');
     });
   }
 
-  // créer une liste déroulante
+  // creéé un dropdown
   createDOM() {
     const details = document.createElement('details');
     details.classList.add('dropdown', `${this.id}-color`);
@@ -60,21 +61,18 @@ export default class Dropdown {
     return details;
   }
 
-  
-// retourne le DOM de la liste déroulante
+  // renvoie DOM du dropdown
   getDOM() {
     return this.createDOM();
   }
- 
-// effacer la liste et rempli avec les nouveaux résultats
+
+  
+// efface la liste et rempli avec les nouveaux résultats
   onChange(results) {
     const keywordSet = new Set();
-   
-// à faire : trouver un moyen de se débarrasser de la recherche de conteneur dans le DOM
+    // TODO : find a way to get rid of searching DOM for container
     const listDOM = document.getElementById(`${this.id}List`);
 
-    
-// remplir l'ensemble de chaque liste déroulante
     results.forEach((result) => {
       switch (this.id) {
         case 'ingredients':
@@ -95,8 +93,7 @@ export default class Dropdown {
 // efface la liste affichée
     while (listDOM.lastElementChild) listDOM.removeChild(listDOM.lastElementChild);
 
-    
-// affiche la nouvelle liste
+    // affiche new list
     keywordSet.forEach((keyword) => {
       const li = document.createElement('li');
       const btn = document.createElement('button');
@@ -106,7 +103,7 @@ export default class Dropdown {
     });
   }
 
-  // filtrer la liste des mots-clés affichés en fonction des termes de recherche de la liste déroulante
+  // filtre la liste des mots-clés affichés en fonction des termes de recherche de la liste déroulante
   filterKeywords(input, list) {
     input.addEventListener('input', () => {
       Array.from(list.childNodes).forEach((listItem) => {
