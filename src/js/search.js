@@ -5,12 +5,14 @@ export default class Search {
     this.recipes = recipes;
     this.results = new Set();
   }
-
+// foction qui retourne les termes et le mots clée pris dans le searchBar via datafuncs.push
   getSearchData() {
     let searchTerms = '';
     let searchKeywords;
     this.dataFuncs.forEach((func) => {
+      // boucle qui vérifie le type si la fonction pushé est string
       typeof func() === 'string' ? (searchTerms = func()) : (searchKeywords = func());
+      // si true search termes prends la valeur du func pushé cf 117 sinon c'est keyword
     });
     return {
       searchTerms,
