@@ -65,7 +65,7 @@ export default class Search {
     return recipes.filter((recipe) => this.verifyKeywordsInRecipe(recipe, keywordsValues));
   }
 
-  // rechercher les résultats correspondants des recettes et ajouter une correspondance aux résultats
+  // recherche les résultats correspondants des recettes et ajoute une correspondance aux résultats
   launchSearch() {
     const data = this.getSearchData();
     const hasSearchTerms = data.searchTerms.length > 0;

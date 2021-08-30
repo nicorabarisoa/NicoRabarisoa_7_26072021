@@ -21,10 +21,15 @@ export default class MainSearchBar {
   }
 
   setSearchTerms(value) {
+
     this.searchTerms = value;
   }
-
+// la recherche doit être de taille 3
   getSearchTerms() {
-    return this.searchTerms;
+    if (this.searchTerms.length < 3){
+      return 0;
+    }
+    else{
+    return this.searchTerms;}
   }
 }

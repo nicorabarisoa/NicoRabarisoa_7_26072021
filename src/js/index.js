@@ -62,28 +62,18 @@ const displayPage = (mainSearch, keywords, dropdowns, results) => {
   container.append(mainSearchDOM, keywordsDOM, dropdownsContainer, resultsDOM);
 };
 
-const handleKeywordAddition = (keywords, search) => {
+const handleKeywordsSelection = (keywords, search) => {
   window.addEventListener('click', (e) => {
-    const isKeywordInDropdown = e.target.closest('.dropdown button');
-    if (isKeywordInDropdown) {
+    const isTargetInDropdown = e.target.closest('.dropdown button');
+    const isTargetKeyword = e.target.closest('.keyword');
+    const target = isTargetInDropdown || isTargetKeyword;
+    if (target) {
       e.preventDefault();
-      const parentId = e.target.closest('ul').id;
-      const keywordId = parentId.substring(0, parentId.length - 4);
-      keywords.onChange(keywordId, isKeywordInDropdown.textContent);
-      e.target.closest('details').removeAttribute('open');
-      search.launchSearch();
-    }
-  });
-};
+      if (isTargetInDropdown) target.closest('details').removeAttribute('open');
+      
 
-const handleKeywordDeletion = (keywords, search) => {
-  window.addEventListener('click', (e) => {
-    const isKeywordButton = e.target.closest('.keyword');
-    if (isKeywordButton) {
-      e.preventDefault();
-      const btnId = isKeywordButton.getAttribute('data-id');
-      const btnText = isKeywordButton.textContent;
-      keywords.onChange(btnId, btnText);
+      const targetId = target.getAttribute('data-id');
+      keywords.onChange(targetId, target.textContent);
       search.launchSearch();
     }
   });
@@ -128,8 +118,7 @@ const onLoad = () => {
   
 // Gére l'événement de clic sur le mot clé dans la liste déroulante pour l'ajouter à la sélection et à la recherche de mots clés
 
-  handleKeywordAddition(keywords, search);
-  handleKeywordDeletion(keywords, search);
+handleKeywordsSelection(keywords, search);
   handleMainSearchBarSearch(mainSearchBar, search);
 };
 
