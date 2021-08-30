@@ -1,6 +1,7 @@
 export default class Keywords {
   constructor() {
     this.selectedKeywords = new Map();
+    this.container = '';
   }
 
   
@@ -9,6 +10,7 @@ export default class Keywords {
     const container = document.createElement('div');
     container.className = 'keywords-container';
     container.id = 'jsKeywords';
+    this.container = container;
     return container;
   }
 
@@ -41,9 +43,9 @@ export default class Keywords {
   
 // créer et ajouter un tag mot-clé ou supprimer de la liste affichée
   updateKeywordList() {
-    const container = document.getElementById('jsKeywords');
+    const container = this.container;
 
-    while (container.lastElementChild) container.removeChild(container.lastElementChild);
+    container.innerHTML = '';
 
     this.selectedKeywords.forEach((keyword) => {
       const btn = this.createKeywordButton(keyword);

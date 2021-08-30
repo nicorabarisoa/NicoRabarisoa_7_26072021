@@ -46,6 +46,7 @@ import MainSearchBar from './mainSearchBar.js';
 import Results from './results.js';
 import Search from './search.js';
 import recipes from './recipes.js';
+import { INGREDIENTS, APPLIANCE, USTENSILS } from './config.js';
 
 const displayPage = (mainSearch, keywords, dropdowns, results) => {
   const container = document.getElementById('jsForm');
@@ -91,9 +92,9 @@ const handleMainSearchBarSearch = (mainSearchBar, search) => {
 const onLoad = () => {
   // initialise les objets
   const mainSearchBar = new MainSearchBar();
-  const ingredientsDropdown = new Dropdown('ingredients');
-  const applianceDropdown = new Dropdown('appliance');
-  const ustensilsDropdown = new Dropdown('ustensils');
+  const ingredientsDropdown = new Dropdown(INGREDIENTS);
+  const applianceDropdown = new Dropdown(APPLIANCE);
+  const ustensilsDropdown = new Dropdown(USTENSILS);
   const recipeResults = new Results();
   const keywords = new Keywords();
   const search = new Search(recipes);
@@ -104,16 +105,16 @@ const onLoad = () => {
 
   
 //  push les fonctions qui obtiendront les termes de recherche et les mots-clés pour la recherche
-  search.dataFuncs.push(mainSearchBar.getSearchTerms.bind(mainSearchBar));
-  search.dataFuncs.push(keywords.getKeywords.bind(keywords));
+search.setSearchData(mainSearchBar.getSearchTerms.bind(mainSearchBar));
+search.setSearchData(keywords.getKeywords.bind(keywords));
 
   // Push des fonctions qui généreront des listes et des résultats dans le DOM pour rechercher
-  dropdowns.forEach((dropdown) => search.resultFuncs.push(dropdown.onChange.bind(dropdown)));
-  search.resultFuncs.push(recipeResults.onChange.bind(recipeResults));
+  dropdowns.forEach((dropdown) => search.setResultsFunctions(dropdown.onChange.bind(dropdown)));
+  search.setResultsFunctions(recipeResults.onChange.bind(recipeResults));
 
   
 // Remplir les listes et les résultats au chargement en fonction de toutes les recettes
-  search.displayResults(recipes);
+search.displayResults();
 
   
 // Gére l'événement de clic sur le mot clé dans la liste déroulante pour l'ajouter à la sélection et à la recherche de mots clés

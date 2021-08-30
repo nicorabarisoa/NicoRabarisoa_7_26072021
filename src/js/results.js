@@ -1,3 +1,4 @@
+import { EMPTYSIZE, WEIGHTUNIT, LITERUNITS } from './config.js';
 export default class Results {
   
   constructor() {
@@ -22,24 +23,7 @@ export default class Results {
     if (quantity) {
       ingredientName.textContent = `${ingredient} : `;
       const quantityElement = document.createElement('span');
-      let quantityText;
-
-      if (unit !== undefined) {
-        switch (unit) {
-          case 'grammes':
-            quantityText = `${quantity} g`;
-            break;
-          case 'litre':
-          case 'litres':
-          case 'Litres':
-            quantityText = `${quantity} L`;
-            break;
-          default:
-            quantityText = `${quantity} ${unit}`;
-        }
-      } else {
-        quantityText = `${quantity}`;
-      }
+      const quantityText = this.handleQuantityText(quantity, unit);
       quantityElement.textContent = quantityText;
       li.append(ingredientName, quantityElement);
     } else {
@@ -53,6 +37,16 @@ export default class Results {
 // retourne le DOM du conteneur de résultats
   getDOM() {
     return this.createDOM();
+  }
+
+   // retourne texte pour la quantité en fonction de la présence et du contenu de l'unité
+   handleQuantityText(quantity, unit) {
+    if (unit) {
+      if (unit === WEIGHTUNIT) return `${quantity} g`;
+      if (LITERUNITS.some((item) => item === unit)) return `${quantity} L`;
+      return `${quantity} ${unit}`;
+    }
+    return `${quantity}`;
   }
 
   createResult(result) {
@@ -113,9 +107,9 @@ export default class Results {
   onChange(results) {
     const container = this.container;
 
-    while (container.lastElementChild) container.removeChild(container.lastElementChild);
+    container.innerHTML = '';
     console.log(results);
-    if (results.size === 0) {
+    if (results.size === EMPTYSIZE) {
       const emptyResult = document.createElement('strong');
       emptyResult.textContent =
         'Aucune recette ne correspond à votre critère ... Vous pouvez chercher "tarte aux pommes", "poisson", etc';

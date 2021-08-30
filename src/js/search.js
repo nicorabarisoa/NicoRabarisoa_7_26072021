@@ -1,3 +1,4 @@
+import { INGREDIENTS, APPLIANCE, USTENSILS, QUERYLENGTH, EMPTYSIZE } from './config.js';
 export default class Search {
   constructor(recipes) {
     this.dataFuncs = [];
@@ -5,19 +6,49 @@ export default class Search {
     this.recipes = recipes;
     this.results = new Set();
   }
+  setSearchData(callback) {
+    this.dataFuncs.push(callback);
+  }
+
 // foction qui retourne les termes et le mots clée pris dans le searchBar via datafuncs.push
   getSearchData() {
     let searchTerms = '';
     let searchKeywords;
     this.dataFuncs.forEach((func) => {
       // boucle qui vérifie le type si la fonction pushé est string
-      typeof func() === 'string' ? (searchTerms = func()) : (searchKeywords = func());
+      if (typeof func() === 'string') {
+        searchTerms = func();
+      } else {
+        searchKeywords = func();
+      }
       // si true search termes prends la valeur du func pushé cf 117 sinon c'est keyword
     });
     return {
       searchTerms,
-      searchKeywords,
+      searchKeywords
     };
+  }
+  verifyKeywordInRecipe(recipe, keyword) {
+    const id = keyword.id;
+    const label = keyword.label;
+    switch (id) {
+      case INGREDIENTS:
+        return recipe.ingredients.some((text) => text.ingredient === label);
+      case APPLIANCE:
+        return recipe.appliance === label;
+      case USTENSILS:
+        return recipe.ustensils.some((text) => text === label);
+    }
+  }
+
+  verifyKeywordsInRecipe(recipe, keywords) {
+    return keywords.every((keyword) => this.verifyKeywordInRecipe(recipe, keyword));
+  }
+
+  filterResultsByKeywords(recipes, keywords) {
+    // filter recipes to check if recipe contains every keyword
+    const keywordsValues = Array.from(keywords.values());
+    return recipes.filter((recipe) => this.verifyKeywordsInRecipe(recipe, keywordsValues));
   }
 
   // filtre les resultats basé sur les termes de recherches
@@ -41,35 +72,13 @@ export default class Search {
     this.results = results;
   }
 
-  verifyKeywordInRecipe(recipe, keyword) {
-    const id = keyword.id;
-    const label = keyword.label;
-    switch (id) {
-      case 'ingredients':
-        return recipe.ingredients.some((text) => text.ingredient === label);
-      case 'appliance':
-        return recipe.appliance === label;
-      case 'ustensils':
-        return recipe.ustensils.some((text) => text === label);
-    }
-  }
-
-  verifyKeywordsInRecipe(recipe, keywords) {
-    return keywords.every((keyword) => this.verifyKeywordInRecipe(recipe, keyword));
-  }
-
-  filterResultsByKeywords(recipes, keywords) {
-    
-// filtrer les recettes pour vérifier si la recette contient tous les mots clés
-    const keywordsValues = Array.from(keywords.values());
-    return recipes.filter((recipe) => this.verifyKeywordsInRecipe(recipe, keywordsValues));
-  }
+  
 
   // recherche les résultats correspondants des recettes et ajoute une correspondance aux résultats
   launchSearch() {
     const data = this.getSearchData();
-    const hasSearchTerms = data.searchTerms.length > 0;
-    const hasKeywords = data.searchKeywords.size > 0;
+    const hasSearchTerms = data.searchTerms.length >= QUERYLENGTH;
+    const hasKeywords = data.searchKeywords.size > EMPTYSIZE;
 
     if (!hasSearchTerms && !hasKeywords) {
       this.displayResults(this.recipes);
@@ -77,17 +86,23 @@ export default class Search {
     }
     if (hasKeywords) {
       const results = this.filterResultsByKeywords(this.recipes, data.searchKeywords);
-      hasSearchTerms ? this.setResults(results, data.searchTerms) : (this.results = results);
+      if (hasSearchTerms) {
+        this.setResults(results, data.searchTerms);
+      } else {
+        this.results = results;
+      }
       this.displayResults(this.results);
       return;
     }
     this.setResults(this.recipes, data.searchTerms);
     this.displayResults(this.results);
   }
-
+  setResultsFunctions(callback) {
+    this.resultFuncs.push(callback);
+  }
   
 // déclenche resultFuncs pour refaire les listes déroulantes et les résultats
-  displayResults(results) {
+displayResults(results = this.recipes) {
     this.resultFuncs.forEach((func) => {
       func(results);
     });
