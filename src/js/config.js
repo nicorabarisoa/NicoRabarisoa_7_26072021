@@ -1,4 +1,4 @@
-const dropdownTexts = Object.freeze({
+export const dropdownTexts = Object.freeze({
   ingredients: Object.freeze({
     summaryText: 'Ingrédients',
     placeholder: 'ingrédient',
@@ -12,5 +12,4 @@ const dropdownTexts = Object.freeze({
     placeholder: 'ustensile',
   }),
 });
-
 export default dropdownTexts;

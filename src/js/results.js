@@ -1,12 +1,52 @@
 export default class Results {
   
+  constructor() {
+    this.container = '';
+  }
 // créer un conteneur de résultats
   createDOM() {
     const container = document.createElement('div');
     container.id = 'jsResults';
     container.className = 'results-container';
 
+    this.container = container;
     return container;
+  }
+
+  createIngredientListItem(recipeIngredient) {
+    const { ingredient, quantity, unit } = recipeIngredient;
+    const li = document.createElement('li');
+    const ingredientName = document.createElement('strong');
+
+    // Change le texteContenu de l'ingrédient selon s'il a une quantité et une unité de quantité
+    if (quantity) {
+      ingredientName.textContent = `${ingredient} : `;
+      const quantityElement = document.createElement('span');
+      let quantityText;
+
+      if (unit !== undefined) {
+        switch (unit) {
+          case 'grammes':
+            quantityText = `${quantity} g`;
+            break;
+          case 'litre':
+          case 'litres':
+          case 'Litres':
+            quantityText = `${quantity} L`;
+            break;
+          default:
+            quantityText = `${quantity} ${unit}`;
+        }
+      } else {
+        quantityText = `${quantity}`;
+      }
+      quantityElement.textContent = quantityText;
+      li.append(ingredientName, quantityElement);
+    } else {
+      ingredientName.textContent = ingredient;
+      li.appendChild(ingredientName);
+    }
+    return li;
   }
 
   
@@ -18,11 +58,12 @@ export default class Results {
   createResult(result) {
     const { description, ingredients, name, time } = result;
 
+     // classNames
     const containerBEM = 'result-card';
     const contentBEM = `${containerBEM}__content`;
     const headBEM = `${contentBEM}__head`;
     const bodyBEM = `${contentBEM}__body`;
-
+    // DOM generation
     const article = document.createElement('article');
     article.className = containerBEM;
 
@@ -52,40 +93,7 @@ export default class Results {
     const list = document.createElement('ul');
     list.className = 'ingredients';
     ingredients.forEach((recipeIngredient) => {
-      const { ingredient, quantity, unit } = recipeIngredient;
-
-      const li = document.createElement('li');
-      const ingredientName = document.createElement('strong');
-
-      
-// Change le textContent de l'ingrédient selon s'il a une quantité et une unité de quantité
-      if (quantity) {
-        ingredientName.textContent = `${ingredient} : `;
-        const quantityElement = document.createElement('span');
-        let quantityText;
-
-        if (unit !== undefined) {
-          switch (unit) {
-            case 'grammes':
-              quantityText = `${quantity} g`;
-              break;
-            case 'litre':
-            case 'litres':
-            case 'Litres':
-              quantityText = `${quantity} L`;
-              break;
-            default:
-              quantityText = `${quantity} ${unit}`;
-          }
-        } else {
-          quantityText = `${quantity}`;
-        }
-        quantityElement.textContent = quantityText;
-        li.append(ingredientName, quantityElement);
-      } else {
-        ingredientName.textContent = ingredient;
-        li.appendChild(ingredientName);
-      }
+      const li = this.createIngredientListItem(recipeIngredient);
 
       list.appendChild(li);
     });
@@ -101,11 +109,20 @@ export default class Results {
   }
 
   
-// effacer la liste des résultats et remplir avec de nouveaux résultats
+
   onChange(results) {
-    const container = document.getElementById('jsResults');
+    const container = this.container;
 
     while (container.lastElementChild) container.removeChild(container.lastElementChild);
+    console.log(results);
+    if (results.size === 0) {
+      const emptyResult = document.createElement('strong');
+      emptyResult.textContent =
+        'Aucune recette ne correspond à votre critère ... Vous pouvez chercher "tarte aux pommes", "poisson", etc';
+      emptyResult.className = 'alert';
+      container.appendChild(emptyResult);
+      return;
+    }
 
     results.forEach((result) => {
       const resultDOM = this.createResult(result);
