@@ -55,17 +55,21 @@ export default class Search {
   // filtre les resultats basé sur les termes de recherches
   setResultsByTextSearch(recipeList, searchTerms) {
     let results = new Set();
+    const searchTermsLower = searchTerms.toLowerCase();
     recipeList.forEach((recipe) => {
       const { name, description, ingredients } = recipe;
-      const isInName = name.includes(searchTerms);
-      const isInDescription = description.includes(searchTerms);
+      const nameLower = name.toLowerCase();
+      const descriptionLower = description.toLowerCase();
+      const isInName = nameLower.includes(searchTermsLower);
+      const isInDescription = descriptionLower.includes(searchTermsLower);
 
       if (isInName || isInDescription) {
         results.add(recipe);
         return;
       }
       ingredients.forEach((ingredient) => {
-        if (ingredient.ingredient.includes(searchTerms)) {
+        const ingredientLower = ingredient.ingredient.toLowerCase();
+        if (ingredientLower.includes(searchTermsLower)) {
           results.add(recipe);
         }
       });
@@ -93,15 +97,18 @@ export default class Search {
       const results = this.getResultsOrRecipes();
       this.setResultsByTextSearch(results, data.searchTerms);
     }
-    this.displayResults();
+    if (hasKeywords || hasSearchTerms) {
+      this.displayResults(this.results);
+    } else {
+      this.displayResults();
+    }
   }
   setResultsFunctions(callback) {
     this.resultFuncs.push(callback);
   }
   
 // déclenche resultFuncs pour refaire les listes déroulantes et les résultats
-displayResults() {
-  const results = this.getResultsOrRecipes();
+displayResults(results = this.recipes) {
     this.resultFuncs.forEach((func) => {
       func(results);
     });
