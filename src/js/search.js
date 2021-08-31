@@ -1,37 +1,91 @@
-import { INGREDIENTS, USTENSILS, APPLIANCE, QUERYLENGTH, EMPTYSIZE } from './config.js';
+import recipes from './data/recipes.js';
+import { MINQUERYLENGTH, INGREDIENTS, APPLIANCE, USTENSILS } from './config.js';
 
 export default class Search {
-  constructor(recipes) {
-    this.dataFuncs = [];
-    this.resultFuncs = [];
+  constructor(index) {
+    this.index = index;
     this.recipes = recipes;
+    this.searchTerms = new Set();
+    this.keywords = new Map();
     this.results = new Set();
-  }
-  setSearchData(callback) {
-    this.dataFuncs.push(callback);
+    this.triggerCallbacks = [];
+    this.recipeMap = this.createRecipeMap();
   }
 
-// foction qui retourne les termes et le mots clée pris dans le searchBar via datafuncs.push
-  getSearchData() {
-    let searchTerms;
-    let searchKeywords;
-    this.dataFuncs.forEach((func) => {
-      // boucle qui vérifie le type si la fonction pushé est string
-      if (typeof func() === 'string') {
-        searchTerms = func();
-      } else {
-        searchKeywords = func();
-      }
-      // si true search termes prends la valeur du func pushé cf 117 sinon c'est keyword
+  createRecipeMap() {
+    const map = new Map();
+    this.recipes.forEach((recipe) => {
+      map.set(recipe.id, recipe);
     });
-    return {
-      searchTerms,
-      searchKeywords
-    };
+    return map;
   }
+
+  updateSearchTerms(value) {
+    const previousSearchSize = this.searchTerms.size;
+    this.searchTerms.clear();
+
+    const words = value.toLowerCase().split(' ');
+    words.forEach((word) => {
+      if (word.length >= MINQUERYLENGTH) this.searchTerms.add(word);
+    });
+    const newSearchSize = this.searchTerms.size;
+    const hasSearchTerms = newSearchSize > 0;
+    const isSearchReset = newSearchSize !== previousSearchSize;
+
+    if (hasSearchTerms || isSearchReset) this.doSearch();
+  }
+
+  searchByTerms() {
+    const termNumbers = this.searchTerms.size;
+    const occurenceCounts = new Map();
+    let resultIds = [];
+
+   
+// pour chaque terme, trouve la sous-chaîne correspondante dans l'index et ajoute les identifiants de recette à resultIds
+    this.searchTerms.forEach((term) => {
+      const match = this.index.get(term);
+      if (match) {
+        resultIds = [...resultIds, ...match];
+      }
+    });
+
+    // ignore le nombre d'occurrences s'il n'y a qu'un seul terme
+    if (termNumbers === 1) {
+      resultIds.forEach((id) => {
+        const recipe = this.recipeMap.get(id);
+        this.results.add(recipe);
+      });
+      return;
+    }
+
+    // compte l'occurrence de chaque identifiant
+    resultIds.forEach((id) => {
+      if (occurenceCounts.has(id)) {
+        const occurenceCount = occurenceCounts.get(id);
+        occurenceCounts.set(id, { id: id, count: occurenceCount.count + 1 });
+      } else {
+        occurenceCounts.set(id, { id: id, count: 1 });
+      }
+    });
+
+    
+// si le nombre total d'occurrences correspond au nombre de termes de recherche, ajouter la recette aux résultats
+    occurenceCounts.forEach((occurence) => {
+      if (occurence.count === termNumbers) {
+        const recipe = this.recipeMap.get(occurence.id);
+        this.results.add(recipe);
+      }
+    });
+  }
+
+  updateSearchKeywords(keywords) {
+    this.keywords = keywords;
+    this.doSearch();
+  }
+
   verifyKeywordInRecipe(recipe, keyword) {
     const id = keyword.id;
-    const label = keyword.label;
+    const label = keyword.text;
     switch (id) {
       case INGREDIENTS:
         return recipe.ingredients.some((text) => text.ingredient === label);
@@ -46,71 +100,45 @@ export default class Search {
     return keywords.every((keyword) => this.verifyKeywordInRecipe(recipe, keyword));
   }
 
-  setResultsByKeywords(recipes, keywords) {
-    // filter recipes to check if recipe contains every keyword
-    const keywordsValues = Array.from(keywords.values());
-    this.results = recipes.filter((recipe) => this.verifyKeywordsInRecipe(recipe, keywordsValues));
-  }
-
-  // filtre les resultats basé sur les termes de recherches
-  setResultsByTextSearch(recipeList, searchTerms) {
-    let results = new Set();
-    const searchTermsLower = searchTerms.toLowerCase();
-    recipeList.forEach((recipe) => {
-      const { name, description, ingredients } = recipe;
-      const nameLower = name.toLowerCase();
-      const descriptionLower = description.toLowerCase();
-      const isInName = nameLower.includes(searchTermsLower);
-      const isInDescription = descriptionLower.includes(searchTermsLower);
-
-      if (isInName || isInDescription) {
-        results.add(recipe);
-        return;
+  searchByKeywords() {
+    const keywordsValues = Array.from(this.keywords.values());
+    if (this.results.size > 0) {
+      for (const recipe of this.results) {
+        const areKeywordsInRecipe = this.verifyKeywordsInRecipe(recipe, keywordsValues);
+        if (!areKeywordsInRecipe) this.results.delete(recipe);
       }
-      ingredients.forEach((ingredient) => {
-        const ingredientLower = ingredient.ingredient.toLowerCase();
-        if (ingredientLower.includes(searchTermsLower)) {
-          results.add(recipe);
-        }
-      });
+      return;
+    }
+    // si les résultats sont vides, ajoutez des recettes qui ont tous les mots-clés aux résultats
+    this.recipes.forEach((recipe) => {
+      if (this.verifyKeywordsInRecipe(recipe, keywordsValues)) this.results.add(recipe);
     });
-    this.results = results;
-  }
-  getResultsOrRecipes() {
-    const isResultsEmpty = this.results.size === EMPTYSIZE;
-    return isResultsEmpty ? this.recipes : this.results;
   }
 
-  
+  doSearch() {
+    this.results.clear();
+    const hasSearchTerms = this.searchTerms.size > 0;
+    const hasKeywords = this.keywords.size > 0;
 
-  // recherche les résultats correspondants des recettes et ajoute une correspondance aux résultats
-  launchSearch() {
-    this.results = new Set();
-    const data = this.getSearchData();
-    const hasSearchTerms = data.searchTerms.length >= QUERYLENGTH;
-    const hasKeywords = data.searchKeywords.size > EMPTYSIZE;
+    if (hasSearchTerms || hasKeywords) {
+      if (hasSearchTerms) {
+        this.searchByTerms();
+      }
+      if (hasKeywords) {
+        this.searchByKeywords();
+      }
+    }
+    const results = hasSearchTerms || hasKeywords ? this.results : this.recipes;
+    this.triggerEvents(results);
+  }
 
-    if (hasKeywords) {
-       this.setResultsByKeywords(this.recipes, data.searchKeywords);
-    }
-    if (hasSearchTerms) {
-      const results = this.getResultsOrRecipes();
-      this.setResultsByTextSearch(results, data.searchTerms);
-    }
-    if (hasKeywords || hasSearchTerms) {
-      this.displayResults(this.results);
-    } else {
-      this.displayResults();
-    }
+  onResult(callback) {
+    this.triggerCallbacks.push(callback);
   }
-  setResultsFunctions(callback) {
-    this.resultFuncs.push(callback);
-  }
-  
-// déclenche resultFuncs pour refaire les listes déroulantes et les résultats
-displayResults(results = this.recipes) {
-    this.resultFuncs.forEach((func) => {
-      func(results);
+
+  triggerEvents(results) {
+    this.triggerCallbacks.forEach((cb) => {
+      cb(results);
     });
   }
 }

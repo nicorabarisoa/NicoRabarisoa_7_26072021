@@ -1,10 +1,10 @@
 import { WEIGHTUNIT, LITERUNITS } from './config.js';
 
 export default class Result {
-  constructor(result) {
-    this.result = result;
+  constructor(recipe) {
+    this.recipe = recipe;
   }
-  // return text for quantity depending of presence and content of unit
+
   handleQuantityText(quantity, unit) {
     if (unit) {
       if (unit === WEIGHTUNIT) return `${quantity} g`;
@@ -19,7 +19,8 @@ export default class Result {
     const li = document.createElement('li');
     const ingredientName = document.createElement('strong');
 
-    // Change textContent of ingredient depending of if it has a quantity and quantity unit
+    
+// Changer le texteContent de l'ingrédient selon s'il a une quantité et une unité de quantité
     if (quantity) {
       ingredientName.textContent = `${ingredient} : `;
       const quantityElement = document.createElement('span');
@@ -34,7 +35,7 @@ export default class Result {
   }
 
   createDOM() {
-    const { description, ingredients, name, time } = this.result;
+    const { description, ingredients, name, time } = this.recipe;
 
     // classNames
     const containerBEM = 'result-card';
@@ -60,6 +61,7 @@ export default class Result {
 
     const img = document.createElement('img');
     img.src = 'public/img/timer.svg';
+    img.alt = 'clock icon';
 
     const timerText = document.createElement('span');
     timerText.textContent = `${time} min`;

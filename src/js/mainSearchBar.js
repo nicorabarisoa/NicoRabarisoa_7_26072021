@@ -1,32 +1,36 @@
 export default class MainSearchBar {
   constructor() {
-    this.searchTerms = '';
+    this.triggerCallbacks = [];
   }
-  // Crée search bar
+
   createDOM() {
     const label = document.createElement('label');
     label.setAttribute('for', 'mainSearch');
     label.className = 'main-search';
+
     const input = document.createElement('input');
     input.type = 'search';
     input.id = 'mainSearch';
     input.placeholder = 'Rechercher un ingrédient, appareil, ustensiles ou une recette';
+
     label.appendChild(input);
+
+    input.addEventListener('input', (e) => {
+      this.triggerEvents(e.target.value);
+    });
+
     return label;
   }
 
-  // return DOM du searchBar
   getDOM() {
     return this.createDOM();
   }
 
-  setSearchTerms(value) {
-
-    this.searchTerms = value;
+  onInputValueChange(cb) {
+    this.triggerCallbacks.push(cb);
   }
-// la recherche doit être de taille 3
-  getSearchTerms() {
-    
-    return this.searchTerms;
+
+  triggerEvents(value) {
+    this.triggerCallbacks.forEach((cb) => cb(value));
   }
 }

@@ -1,4 +1,4 @@
-import { dropdownTexts, INGREDIENTS, APPLIANCE, USTENSILS } from './config.js';
+import { APPLIANCE, dropdownTexts, INGREDIENTS, USTENSILS } from './config.js';
 
 export default class Dropdown {
   constructor(id) {
@@ -6,34 +6,17 @@ export default class Dropdown {
     this.summaryText = dropdownTexts[id].summaryText;
     this.placeholder = dropdownTexts[id].placeholder;
     this.list = '';
+    this.input = '';
+    this.triggerCallbacks = [];
   }
 
   createArrowIMG() {
     const img = document.createElement('img');
     img.src = 'public/img/arrow.svg';
+    img.alt = 'flèche';
     return img;
   }
 
-  attachDropdownEvents(details) {
-    // toggle events
-    details.addEventListener('toggle', (e) => {
-      if (!e.target.open) return;
-      const openDropdowns = document.querySelectorAll('.auxiliary-search[open]');
-      openDropdowns.forEach((dropdown) => {
-        if (dropdown === e.target) return;
-        dropdown.removeAttribute('open');
-      });
-    });
-
-    
-// cliquer en dehors ferme
-    window.addEventListener('click', (e) => {
-      if (!details.open || e.target.closest('[open]') === details) return;
-      details.removeAttribute('open');
-    });
-  }
-
-  // creéé un dropdown
   createDOM() {
     const details = document.createElement('details');
     details.classList.add('dropdown', `${this.id}-color`);
@@ -49,6 +32,7 @@ export default class Dropdown {
     input.id = `${this.id}Search`;
     input.type = 'text';
     input.placeholder = `Recherche un ${this.placeholder}`;
+    this.input = input;
     inputDiv.append(input, this.createArrowIMG());
 
     const list = document.createElement('ul');
@@ -57,54 +41,14 @@ export default class Dropdown {
 
     details.append(summary, inputDiv, list);
 
-    this.attachDropdownEvents(details);
-    this.filterKeywords(input, list);
-
-    return details;
-  }
-
-  // renvoie DOM du dropdown
-  getDOM() {
-    return this.createDOM();
-  }
-
-  
-// efface la liste et rempli avec les nouveaux résultats
-  onChange(results) {
-    const keywordSet = new Set();
-    const list = this.list;
-
-    results.forEach((result) => {
-      switch (this.id) {
-        case INGREDIENTS:
-          result.ingredients.forEach((ingredientItem) => keywordSet.add(ingredientItem.ingredient));
-          break;
-          case APPLIANCE:
-          keywordSet.add(result.appliance);
-          break;
-          case USTENSILS:
-          result.ustensils.every((ustensil) => keywordSet.add(ustensil));
-          break;
-      }
+    //toggle dropdown
+    window.addEventListener('click', (e) => {
+      if (!details.open || e.target.closest('[open]') === details) return;
+      details.removeAttribute('open');
     });
 
     
-// efface la liste affichée
-list.innerHTML = '';
-    // affiche new list
-    keywordSet.forEach((keyword) => {
-      
-      const btn = document.createElement('button');
-      btn.setAttribute('data-id', this.id);
-      btn.textContent = keyword;
-      const li = document.createElement('li');
-      li.appendChild(btn);
-      list.appendChild(li);
-    });
-  }
-
-  // filtre la liste des mots-clés affichés en fonction des termes de recherche de la liste déroulante
-  filterKeywords(input, list) {
+  //filtre les mots-clés de la liste
     input.addEventListener('input', () => {
       Array.from(list.childNodes).forEach((listItem) => {
         const itemText = listItem.textContent.toLowerCase();
@@ -115,5 +59,64 @@ list.innerHTML = '';
         }
       });
     });
+
+    return details;
+  }
+
+  getDOM() {
+    return this.createDOM();
+  }
+
+  createListItem(string) {
+    const btn = document.createElement('button');
+    btn.setAttribute('data-id', this.id);
+    btn.textContent = string;
+
+    const li = document.createElement('li');
+    li.appendChild(btn);
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.triggerEvents({
+        id: this.id,
+        text: string
+      });
+    });
+
+    return li;
+  }
+
+  updateList(results) {
+    const keywordSet = new Set();
+    const fragment = new DocumentFragment();
+
+    while (this.list.lastElementChild) this.list.removeChild(this.list.lastElementChild);
+
+    results.forEach((result) => {
+      switch (this.id) {
+        case INGREDIENTS:
+          result.ingredients.forEach((ingredientItem) => keywordSet.add(ingredientItem.ingredient));
+          break;
+        case APPLIANCE:
+          keywordSet.add(result.appliance);
+          break;
+        case USTENSILS:
+          result.ustensils.every((ustensil) => keywordSet.add(ustensil));
+          break;
+      }
+    });
+
+    keywordSet.forEach((keyword) => {
+      fragment.appendChild(this.createListItem(keyword));
+    });
+    this.list.appendChild(fragment);
+  }
+
+  onTagSelection(cb) {
+    this.triggerCallbacks.push(cb);
+  }
+
+  triggerEvents(keyword) {
+    this.triggerCallbacks.forEach((cb) => cb(keyword));
   }
 }

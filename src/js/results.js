@@ -1,47 +1,41 @@
-import { EMPTYSIZE } from './config.js';
+import recipes from './data/recipes.js';
 import Result from './result.js';
+
 export default class Results {
-  
   constructor() {
     this.container = '';
+    this.recipes = recipes;
   }
-// créer un conteneur de résultats
+
   createDOM() {
     const container = document.createElement('div');
     container.id = 'jsResults';
     container.className = 'results-container';
-
     this.container = container;
     return container;
   }
-  // retourne le DOM du conteneur de résultats
+
   getDOM() {
     return this.createDOM();
   }
 
-
-  
-
-  
-
-  onChange(results) {
+  displayResults(results = this.recipes) {
     const container = this.container;
+    const fragment = new DocumentFragment();
 
-    container.innerHTML = '';
-    console.log(results);
-    if (results.size === EMPTYSIZE) {
+    while (container.lastElementChild) container.removeChild(container.lastElementChild);
+    if (results.size === 0) {
       const emptyResult = document.createElement('strong');
+      emptyResult.className = 'alert';
       emptyResult.textContent =
         'Aucune recette ne correspond à votre critère ... Vous pouvez chercher "tarte aux pommes", "poisson", etc';
-      emptyResult.className = 'alert';
       container.appendChild(emptyResult);
       return;
     }
-
-    results.forEach((result) => {
-      const resultObj = new Result(result);
-      const resultDOM = resultObj.getDOM();
-      container.appendChild(resultDOM);
+    results.forEach((recipe) => {
+      const result = new Result(recipe);
+      fragment.appendChild(result.getDOM());
     });
+    container.appendChild(fragment);
   }
 }
